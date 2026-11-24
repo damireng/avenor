@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="icon.png">
+<meta property="og:title" content="Avenor">
+<meta property="og:description" content="Эстетичный полноэкранный музыкальный плеер для Windows: YouTube Music, Spotify, Яндекс Музыка и SoundCloud в одном окне.">
+<meta property="og:image" content="icon.png">
+<title>Avenor</title>
+<meta name="description" content="Avenor — эстетичный полноэкранный музыкальный плеер для Windows: YouTube Music, Spotify, Яндекс Музыка и SoundCloud в одном окне, клипы на фоне и неоновая подсветка в такт.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a stage-like page — the hero is the app itself (a neon-framed screen), then plain sections that read like
+   liner notes: what it does, which services, three steps to start, specs, questions, download.
+   One committed dark look (a night stage), so a single palette; every color is a token. */
+:root {
+  color-scheme: dark;
+  --night: #0b0812;          /* page ground: violet-black */
+  --night-2: #140e20;        /* raised surfaces */
+  --line: #2a2138;           /* hairlines on dark */
+  --ink: #f2ecf7;            /* main text */
+  --ink-soft: #b6aac6;       /* secondary text */
+  --neon: #ff3d8b;           /* the frame's pink */
+  --neon-warm: #ff9a3c;      /* the frame's orange */
+  --neon-cool: #9b5cff;      /* violet end of the glow */
+  --f-display: "Unbounded", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --step--1: clamp(0.82rem, 0.8rem + 0.1vw, 0.88rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.08rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.45rem);
+  --step-2: clamp(1.6rem, 1.3rem + 1.3vw, 2.4rem);
+  --step-3: clamp(2.2rem, 1.5rem + 3.2vw, 4.4rem);
+}
+* { box-sizing: border-box; }
+body { background: var(--night); color: var(--ink); font-family: var(--f-body); font-size: var(--step-0); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 500; line-height: 1.1; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.eyebrow { font-family: var(--f-mono); font-size: var(--step--1); letter-spacing: .12em; text-transform: uppercase; color: var(--neon-warm); }
+:focus-visible { outline: 2px solid var(--neon-warm); outline-offset: 3px; border-radius: 6px; }
+
+/* ---------- top bar ---------- */
+.top { padding-block: 22px; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 700; letter-spacing: .04em; text-decoration: none; }
+.brand-mark { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--neon-warm), var(--neon) 55%, var(--neon-cool)); box-shadow: 0 0 18px color-mix(in srgb, var(--neon) 60%, transparent); display: grid; place-items: center; }
+.brand-mark svg { width: 16px; height: 16px; }
+.top nav { display: flex; gap: 22px; font-size: var(--step--1); color: var(--ink-soft); }
+.top nav a { text-decoration: none; }
+.top nav a:hover { color: var(--ink); }
+@media (max-width: 640px) { .top nav { display: none; } }
+
+/* ---------- buttons ---------- */
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; border-radius: 999px; font-weight: 700; text-decoration: none; font-size: var(--step-0); transition: transform .2s ease, box-shadow .2s ease; }
+.btn-main { color: #1a0710; background: linear-gradient(100deg, var(--neon-warm), var(--neon)); box-shadow: 0 10px 34px -8px color-mix(in srgb, var(--neon) 70%, transparent); }
+.btn-main:hover { transform: translateY(-2px); box-shadow: 0 14px 40px -8px color-mix(in srgb, var(--neon) 85%, transparent); }
+.btn-ghost { color: var(--ink); border: 1px solid var(--line); background: color-mix(in srgb, var(--night-2) 70%, transparent); }
+.btn-ghost:hover { border-color: var(--ink-soft); }
+.btn small { font-weight: 500; opacity: .75; font-family: var(--f-mono); font-size: .75em; }
+
+/* ---------- hero ---------- */
+.hero { padding-block: 28px 72px; }
+.hero .wrap { display: grid; gap: 44px; }
+.hero h1 { font-size: var(--step-3); font-weight: 300; letter-spacing: -.01em; max-width: 15ch; }
+.hero h1 b { font-weight: 700; background: linear-gradient(100deg, var(--neon-warm), var(--neon) 60%, var(--neon-cool)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero .lead { color: var(--ink-soft); font-size: var(--step-1); max-width: 52ch; margin-top: 18px; }
+.hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.hero .note { margin-top: 14px; font-family: var(--f-mono); font-size: var(--step--1); color: var(--ink-soft); }
+
+/* the app on a screen: neon frame + outline clock + album card + player bar (drawn, no real covers) */
+.screen { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 18px; overflow: hidden;
+  background: radial-gradient(120% 90% at 20% 15%, #3a1238 0%, transparent 55%), radial-gradient(90% 80% at 85% 80%, #2a1650 0%, transparent 60%), #0e0915;
+  box-shadow: 0 40px 90px -30px #000, 0 0 0 1px var(--line); }
+.screen::before { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--neon) 80%, transparent), inset 0 0 28px 6px color-mix(in srgb, var(--neon) 55%, transparent), inset 0 -10px 60px -10px var(--neon-warm);
+  animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: .75; } 12% { opacity: 1; } }
+.screen .wave { position: absolute; left: 0; right: 0; bottom: 0; height: 22%; pointer-events: none;
+  background: linear-gradient(to top, color-mix(in srgb, var(--neon) 55%, transparent), transparent);
+  -webkit-mask: radial-gradient(40% 100% at var(--x, 30%) 100%, #000 30%, transparent 70%), linear-gradient(to top, #000 15%, transparent 55%);
+          mask: radial-gradient(40% 100% at var(--x, 30%) 100%, #000 30%, transparent 70%), linear-gradient(to top, #000 15%, transparent 55%);
+  animation: run 6s linear infinite; }
+@keyframes run { from { --x: -20%; } to { --x: 120%; } }
+@property --x { syntax: "<percentage>"; inherits: false; initial-value: 30%; }
+.clock { position: absolute; top: 9%; left: 50%; transform: translateX(-50%); font-family: var(--f-display); font-weight: 300; font-size: clamp(2.6rem, 9vw, 7.5rem); line-height: 1;
+  color: transparent; -webkit-text-stroke: 1.5px var(--neon); filter: drop-shadow(0 0 6px var(--neon)) drop-shadow(0 0 18px color-mix(in srgb, var(--neon) 60%, transparent)); letter-spacing: .02em; }
+.date { position: absolute; top: 5%; left: 50%; transform: translateX(-50%); font-family: var(--f-mono); font-size: clamp(.5rem, 1vw, .8rem); color: var(--neon-warm); }
+.queue { position: absolute; left: 3.5%; top: 34%; width: 22%; display: grid; gap: 7%; }
+.queue i { display: flex; align-items: center; gap: 8%; font-style: normal; }
+.queue i::before { content: ""; width: 18%; aspect-ratio: 1; border-radius: 4px; background: linear-gradient(135deg, var(--c1), var(--c2)); flex: none; }
+.queue i span { height: .45em; flex: 1; border-radius: 4px; background: color-mix(in srgb, var(--ink) 30%, transparent); font-size: clamp(.5rem, 1.2vw, 1rem); }
+.queue i:first-child span { background: color-mix(in srgb, var(--ink) 70%, transparent); }
+.card { position: absolute; left: 30%; top: 38%; width: 17%; aspect-ratio: .78; border-radius: 12px; padding: 4%;
+  background: linear-gradient(170deg, rgba(255,255,255,.22), rgba(255,255,255,.06)); border: 1px solid rgba(255,255,255,.28);
+  transform: perspective(600px) rotateY(11deg) rotateX(4deg); box-shadow: 0 18px 40px -12px #000; display: grid; grid-template-rows: 1fr auto; gap: 6%; }
+.card .art { border-radius: 8px; background: radial-gradient(60% 60% at 35% 30%, var(--neon-warm), transparent 70%), radial-gradient(70% 70% at 70% 75%, var(--neon-cool), transparent 70%), var(--neon); }
+.card .t { height: 14px; display: grid; gap: 4px; }
+.card .t::before, .card .t::after { content: ""; height: 4px; border-radius: 3px; background: rgba(255,255,255,.75); width: 70%; margin: 0 auto; }
+.card .t::after { width: 45%; opacity: .6; }
+.lyric { position: absolute; right: 6%; top: 40%; width: 34%; font-family: var(--f-display); font-weight: 700; font-size: clamp(.55rem, 1.7vw, 1.35rem); line-height: 1.25; text-transform: uppercase; color: rgba(255,255,255,.9); text-align: right; }
+.lyric em { font-style: normal; color: var(--neon-warm); }
+.bar { position: absolute; left: 20%; right: 20%; bottom: 5%; height: 9%; border-radius: 999px; background: rgba(10,8,16,.78); border: 1px solid rgba(255,255,255,.12); display: flex; align-items: center; gap: 4%; padding: 0 3%; }
+.bar b { width: 6%; aspect-ratio: 1; border-radius: 50%; background: var(--neon); flex: none; }
+.bar u { flex: 1; height: 14%; border-radius: 4px; background: linear-gradient(90deg, var(--neon) 38%, rgba(255,255,255,.2) 38%); }
+.bar s { width: 3%; aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.55); flex: none; }
+@media (prefers-reduced-motion: reduce) { .screen::before, .screen .wave { animation: none; } }
+
+/* ---------- sections ---------- */
+section { padding-block: 64px; border-top: 1px solid var(--line); }
+.sec-head { display: grid; gap: 12px; margin-bottom: 36px; max-width: 60ch; }
+.sec-head h2 { font-size: var(--step-2); }
+.sec-head p { color: var(--ink-soft); }
+
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 28px 40px; }
+.feature { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.feature h3 { font-size: var(--step-1); font-weight: 500; }
+.feature p { color: var(--ink-soft); }
+.feature .k { font-family: var(--f-mono); font-size: var(--step--1); color: var(--neon); }
+
+.services { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 14px; }
+.svc { border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 20px; background: var(--night-2); display: grid; gap: 6px; min-width: 0; }
+.svc b { font-family: var(--f-display); font-weight: 500; font-size: var(--step-1); }
+.svc span { color: var(--ink-soft); font-size: var(--step--1); }
+.svc .how { font-family: var(--f-mono); font-size: var(--step--1); color: var(--neon-warm); }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 28px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.steps li::before { content: counter(s); font-family: var(--f-display); font-size: var(--step-2); font-weight: 300; color: transparent; -webkit-text-stroke: 1px var(--neon); line-height: 1; }
+.steps h3 { font-size: var(--step-1); font-weight: 500; }
+.steps p { color: var(--ink-soft); }
+
+.specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.specs div { padding: 18px 20px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); display: grid; gap: 4px; min-width: 0; }
+.specs dt { font-family: var(--f-mono); font-size: var(--step--1); color: var(--ink-soft); letter-spacing: .06em; text-transform: uppercase; }
+.specs dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.faq { display: grid; gap: 10px; max-width: 80ch; }
+.faq details { border: 1px solid var(--line); border-radius: 12px; background: var(--night-2); padding: 0 18px; }
+.faq summary { cursor: pointer; padding: 16px 0; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-family: var(--f-mono); color: var(--neon); }
+.faq details[open] summary::after { content: "−"; }
+.faq details p { color: var(--ink-soft); padding-bottom: 16px; }
+
+.download { text-align: left; }
+.download .box { border-radius: 22px; padding: clamp(24px, 5vw, 48px); background: radial-gradient(80% 140% at 0% 0%, color-mix(in srgb, var(--neon) 28%, transparent), transparent 60%), radial-gradient(70% 120% at 100% 100%, color-mix(in srgb, var(--neon-cool) 30%, transparent), transparent 60%), var(--night-2); border: 1px solid var(--line); display: grid; gap: 18px; }
+.download h2 { font-size: var(--step-2); }
+.download .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.download .fine { color: var(--ink-soft); font-size: var(--step--1); font-family: var(--f-mono); }
+
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--ink-soft); font-size: var(--step--1); }
+footer .wrap { display: grid; gap: 10px; }
+</style>
+
+<style>html,body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Avenor">
+      <span class="brand-mark"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M9 17.5a2.5 2.5 0 1 1-2-2.45V5.5l11-2v11.5a2.5 2.5 0 1 1-2-2.45V7.1l-7 1.3z"/></svg></span>
+      AVENOR
+    </a>
+    <nav aria-label="Разделы">
+      <a href="#features">Возможности</a>
+      <a href="#services">Сервисы</a>
+      <a href="#start">Как начать</a>
+      <a href="#faq">Вопросы</a>
+    </nav>
+    <a class="btn btn-ghost" href="#download">Скачать</a>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Музыкальный плеер для Windows</p>
+        <h1>Вся твоя музыка в <b>одном неоновом окне</b></h1>
+        <p class="lead">Avenor играет YouTube Music, Spotify, Яндекс Музыку и SoundCloud под твоими аккаунтами. Клип исполнителя идёт фоном, подсветка бежит по краю экрана и подпрыгивает на басу.</p>
+        <div class="ctas">
+          <a class="btn btn-main" href="#download">Скачать для Windows <small>v1.0.0</small></a>
+          <a class="btn btn-ghost" href="#features">Что умеет</a>
+        </div>
+        <p class="note">Бесплатно · Windows 10/11 · 83 МБ</p>
+      </div>
+      <div class="screen" role="img" aria-label="Интерфейс Avenor: неоновая рамка, часы, список песен, карточка альбома, текст песни и панель плеера">
+        <span class="date">Tue Nov 24</span>
+        <span class="clock">7:00</span>
+        <div class="queue" aria-hidden="true">
+          <i style="--c1:#ff9a3c;--c2:#ff3d8b"><span></span></i>
+          <i style="--c1:#9b5cff;--c2:#3a6bff"><span></span></i>
+          <i style="--c1:#18c29c;--c2:#0d6b8a"><span></span></i>
+          <i style="--c1:#ffd23c;--c2:#ff6b3c"><span></span></i>
+          <i style="--c1:#ff3d8b;--c2:#6b1d5c"><span></span></i>
+        </div>
+        <div class="card" aria-hidden="true"><div class="art"></div><div class="t"></div></div>
+        <p class="lyric" aria-hidden="true">Ночь горит <em>неоном</em>, город не спит</p>
+        <div class="bar" aria-hidden="true"><b></b><u></u><s></s><s></s><s></s></div>
+        <div class="wave" aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Возможности</p>
+        <h2>Плеер, который выглядит как сцена</h2>
+        <p>Avenor не заменяет твои сервисы. Он собирает их в одно красивое окно на весь экран.</p>
+      </div>
+      <div class="features">
+        <div class="feature"><span class="k">клип · Full HD</span><h3>Клип исполнителя на фоне</h3><p>Для каждой песни находится официальный клип и играет фоном. Цвет часов и подсветки подстраивается под картинку.</p></div>
+        <div class="feature"><span class="k">бас · волна</span><h3>Подсветка в такт музыке</h3><p>Светящаяся волна бежит по краю экрана и подпрыгивает на каждом ударе баса. Слушает то, что реально играет.</p></div>
+        <div class="feature"><span class="k">400+ песен</span><h3>Одна библиотека</h3><p>Лайки из Spotify, Яндекс Музыки и SoundCloud переносятся в одно место. Можно смотреть по сервису или перемешать всё.</p></div>
+        <div class="feature"><span class="k">∞ поток</span><h3>«Моя волна»</h3><p>Настоящая «Моя волна» Яндекса или бесконечный поток по твоим лайкам и похожим исполнителям.</p></div>
+        <div class="feature"><span class="k">текст · альбомы</span><h3>Текст, профили, альбомы</h3><p>Текст песни коллажем рядом с карточкой, страница исполнителя, альбом и карусель альбомов.</p></div>
+        <div class="feature"><span class="k">1–2 % CPU</span><h3>Фоновый режим</h3><p>Окно прячется в трей, играет только музыка. Управление медиаклавишами и значком у часов.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Сервисы</p>
+        <h2>Работает с тем, что у тебя уже есть</h2>
+        <p>Музыка играет через официальные сайты и программы сервисов под твоими аккаунтами и подписками.</p>
+      </div>
+      <div class="services">
+        <div class="svc"><b>YouTube Music</b><span>Работает сразу, без входа.</span><span class="how">внутри Avenor</span></div>
+        <div class="svc"><b>Яндекс Музыка</b><span>Полные треки с подпиской Плюс, «Моя волна».</span><span class="how">внутри Avenor</span></div>
+        <div class="svc"><b>SoundCloud</b><span>Поиск, лайки и воспроизведение.</span><span class="how">внутри Avenor</span></div>
+        <div class="svc"><b>Spotify</b><span>Нужны программа Spotify и Premium. Avenor держит её в фоне без окна.</span><span class="how">через программу Spotify</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Как начать</p>
+        <h2>Три шага до первой песни</h2>
+      </div>
+      <ol class="steps">
+        <li><h3>Скачай и запусти</h3><p>Установщик или переносная версия, которая работает без установки.</p></li>
+        <li><h3>Выбери сервис</h3><p>Круглая кнопка слева в нижней панели. YouTube Music работает сразу, в остальные войди один раз.</p></li>
+        <li><h3>Перенеси лайки</h3><p>«Моя библиотека» → Import. Песни из всех сервисов окажутся в одном списке.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="specs">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Системные требования</p><h2>Что нужно</h2></div>
+      <dl class="specs">
+        <div><dt>Система</dt><dd>Windows 10 / 11, 64-бит</dd></div>
+        <div><dt>Размер</dt><dd>83 МБ</dd></div>
+        <div><dt>Интернет</dt><dd>Нужен для музыки и клипов</dd></div>
+        <div><dt>Версия</dt><dd>1.0.0</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head"><p class="eyebrow">Вопросы</p><h2>Частые вопросы</h2></div>
+      <div class="faq">
+        <details><summary>Avenor бесплатный?</summary><p>Да. Сами сервисы работают по своим правилам: для полных треков в Яндекс Музыке нужен Плюс, для Spotify нужен Premium.</p></details>
+        <details><summary>Нужно ли платить за все сервисы сразу?</summary><p>Нет. Пользуйся только тем, что у тебя есть. YouTube Music работает вообще без входа.</p></details>
+        <details><summary>Почему Spotify играет через свою программу?</summary><p>Spotify не разрешает сторонним приложениям воспроизводить защищённый звук своим веб-плеером. Avenor запускает программу Spotify в фоне без окна и управляет ею, так что звук настоящий, из Spotify.</p></details>
+        <details><summary>Будет ли версия для телефона?</summary><p>Да, мобильная версия в планах.</p></details>
+        <details><summary>Безопасно ли входить в аккаунты?</summary><p>Вход происходит на официальных страницах сервисов внутри Avenor. Пароли не сохраняются и никуда не отправляются, сохраняются только сессии, как в обычном браузере.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="download">
+    <div class="wrap">
+      <div class="box">
+        <p class="eyebrow">Скачать</p>
+        <h2>Avenor 1.0.0 для Windows</h2>
+        <div class="ctas">
+          <a class="btn btn-main" href="downloads/Avenor-Setup-1.0.0.exe">Установщик <small>.exe · 83 МБ</small></a>
+          <a class="btn btn-ghost" href="downloads/Avenor.exe">Переносная версия <small>без установки</small></a>
+        </div>
+        <p class="fine">Windows может предупредить о неизвестном издателе: нажми «Подробнее» → «Выполнить в любом случае».</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Avenor · 2026</p>
+    <p>Avenor не хранит и не раздаёт музыку. YouTube Music, Spotify, Яндекс Музыка и SoundCloud — товарные знаки их владельцев; Avenor с ними не связан.</p>
+  </div>
+</footer>
+
+</body>
+</html>
