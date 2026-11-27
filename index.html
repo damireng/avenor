@@ -8,7 +8,7 @@
 <link rel="icon" href="icon.png">
 <meta property="og:title" content="Avenor — музыка, которая светится">
 <meta property="og:description" content="Клип на весь экран, свет по краям в цветах обложки и текст песни по словам. YouTube Music, Spotify, Яндекс Музыка, SoundCloud.">
-<meta property="og:image" content="https://damireng.github.io/avenor/media/hero.jpg">
+<meta property="og:image" content="https://damireng.github.io/avenor/media/v-hero.jpg">
 <meta name="theme-color" content="#08070c">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -144,6 +144,56 @@
   footer { border-top: 1px solid var(--line); padding: 34px 0 44px; color: var(--dim); font-size: 13.5px; }
   footer a { color: var(--dim); }
 
+  /* ---------- v2: scroll progress, tilting screen, ambient light, film reel, live light demo ---------- */
+  .progress { position: fixed; left: 0; top: 0; height: 3px; width: 100%; z-index: 60; transform-origin: left; transform: scaleX(var(--p, 0)); background: var(--grad); pointer-events: none; }
+  .stage { position: relative; margin: 64px auto 0; width: min(1180px, 100%); perspective: 1600px; isolation: isolate; }
+  .stage .screen { margin: 0; transform-origin: 50% 0; transform: rotateX(var(--tilt, 0deg)) scale(var(--sc, 1)); will-change: transform; transition: box-shadow .8s;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.1), 0 40px 120px rgba(0,0,0,.6); }
+  .stage .screen::after { display: none; }
+  /* the light around the screen takes the colors of what plays in it (like Avenor itself) */
+  .aura { position: absolute; inset: 4% -3% -6%; z-index: -1; border-radius: 40px; pointer-events: none; filter: blur(70px); opacity: .85;
+    background: radial-gradient(60% 60% at 30% 40%, rgb(var(--a1, 255 122 40) / .8), transparent 70%), radial-gradient(60% 60% at 75% 60%, rgb(var(--a2, 255 79 154) / .75), transparent 70%);
+    transition: background 1.2s ease; transform: rotateX(var(--tilt, 0deg)) scale(var(--sc, 1)); }
+  .reel { margin-top: 120px; }
+  .reel .stage { margin-top: 0; }
+  .reel .screen { aspect-ratio: 16 / 9; }
+  .reel .screen video { position: absolute; inset: 0; height: 100%; opacity: 0; transition: opacity .7s ease; }
+  .reel .screen video.on { opacity: 1; }
+  .tabs { display: flex; gap: 10px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+  .tab { appearance: none; border: 1px solid var(--line); background: var(--card); color: var(--dim); font: 700 14.5px/1 Manrope, sans-serif; padding: 12px 18px 14px; border-radius: 14px; cursor: pointer;
+    min-width: 150px; text-align: left; position: relative; overflow: hidden; transition: color .25s, border-color .25s, background .25s; }
+  .tab:hover { color: #fff; }
+  .tab.on { color: #fff; border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.08); }
+  .tab i { position: absolute; left: 12px; right: 12px; bottom: 6px; height: 2px; border-radius: 2px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .tab i b { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(var(--t, 0)); background: var(--grad); }
+  .reel .cap { text-align: center; color: var(--dim); max-width: 640px; margin: 22px auto 0; min-height: 3.2em; transition: opacity .3s; }
+  .reel .cap b { color: #fff; }
+  /* live light demo */
+  .demo { position: relative; margin: 54px auto 0; width: min(900px, 100%); aspect-ratio: 16 / 9; border-radius: 22px; overflow: hidden; background: #07050b; }
+  .demo canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .demo .art { position: absolute; inset: 0; background: center / cover no-repeat; filter: blur(28px) brightness(.55) saturate(1.3); transform: scale(1.15); }
+  .demo .card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 18px; padding: 14px 22px 14px 14px; border-radius: 20px;
+    background: rgba(10,8,16,.5); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); text-align: left; }
+  .demo .card img { width: 74px; height: 74px; border-radius: 12px; object-fit: cover; }
+  .demo .card b { display: block; font-size: 18px; white-space: nowrap; } .demo .card span { color: var(--dim); font-size: 14px; white-space: nowrap; }
+  .swatches { display: flex; gap: 10px; justify-content: center; margin-top: 22px; flex-wrap: wrap; }
+  .sw { width: 34px; height: 34px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; transition: transform .2s, border-color .2s; }
+  .sw:hover { transform: scale(1.12); } .sw.on { border-color: #fff; }
+  .sw.auto { background: conic-gradient(#ff4f9a, #ffb347, #3a6bff, #9b5cff, #ff4f9a); }
+  .demo-row { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+  /* cards light up under the cursor */
+  .spot { position: relative; }
+  .spot::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
+    background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.09), transparent 60%); }
+  .spot:hover::before { opacity: 1; }
+  /* headline words rise one after another */
+  .hero h1 .w { display: inline-block; opacity: 0; transform: translateY(.5em); filter: blur(8px); animation: wordIn .9s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: calc(var(--d) * 90ms + 100ms); }
+  @keyframes wordIn { to { opacity: 1; transform: none; filter: none; } }
+  /* (a word is its own box, so the gradient text is painted per word) */
+  .grad .w { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .08em; }
+  @media (prefers-reduced-motion: reduce) { .hero h1 .w { animation: none; opacity: 1; transform: none; filter: none; } .stage .screen, .aura { transform: none !important; } }
+  @media (max-width: 600px) { .tab { min-width: 0; flex: 1 1 40%; font-size: 13.5px; } .reel { margin-top: 80px; } .demo .card img { width: 52px; height: 52px; } .demo .card { gap: 12px; padding: 10px 16px 10px 10px; } }
+
   /* reveal on scroll */
   .rv { opacity: 0; transform: translateY(26px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
   .rv.in { opacity: 1; transform: none; }
@@ -171,6 +221,7 @@
 </style>
 </head>
 <body>
+<div class="progress"></div>
 
 <nav class="nav">
   <a class="brand" href="#top"><img src="icon.png" alt="">Avenor</a>
@@ -191,42 +242,58 @@
       <a class="btn btn-ghost" href="#download">Android</a>
     </div>
     <div class="meta rv"><span>Windows 10 и 11</span><span>Android</span><span>6 языков</span><span>$6.99 один раз</span></div>
-    <div class="screen rv">
-      <video src="media/hero.mp4" poster="media/hero.jpg" autoplay muted loop playsinline preload="metadata"></video>
+    <div class="stage tilt rv">
+      <div class="aura"></div>
+      <div class="screen"><video src="media/v-hero.mp4" poster="media/v-hero.jpg" autoplay muted loop playsinline preload="metadata"></video></div>
     </div>
   </div>
 </header>
 
-<section id="look">
-  <div class="wrap split">
-    <div class="txt rv">
-      <p class="eyebrow">Как это выглядит</p>
-      <h2>Свет, который<br><span class="grad">играет вместе с песней.</span></h2>
-      <p>По краям экрана горит живая кромка — её цвет берётся из обложки альбома. На ударных она вспыхивает и выбрасывает искры, на тихих местах успокаивается, а на паузе мягко гаснет и ничего не тратит.</p>
-    </div>
-    <div class="media glow rv"><video src="media/glow.mp4" poster="media/glow.jpg" autoplay muted loop playsinline preload="none"></video></div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap split rev">
-    <div class="txt rv">
-      <p class="eyebrow">Под настроение</p>
-      <h2>Любой цвет.<br><span class="grad">Любой стиль.</span></h2>
-      <p>24 цвета света и свой — любой из палитры. Толщина, яркость, скорость огня. Высокие узкие часы, жирные, контурные или цифровые — в цвет клипа или в свой.</p>
-    </div>
-    <div class="media rv"><video src="media/colors.mp4" poster="media/colors.jpg" autoplay muted loop playsinline preload="none"></video></div>
-  </div>
-</section>
-
-<section class="band">
+<section id="look" class="reel">
   <div class="wrap">
-    <div class="media rv"><img src="media/wallpaper.jpg" alt="Клип песни как обои рабочего стола" loading="lazy"></div>
-    <div class="over">
-      <p class="eyebrow">Обои</p>
-      <h2>Клип — прямо<br>на рабочем столе.</h2>
-      <p>Одно нажатие — и клип играющей песни становится живыми обоями под всеми окнами. С часами и светом по краям.</p>
+    <div class="center">
+      <p class="eyebrow rv">Как это выглядит</p>
+      <h2 class="rv">Каждая песня —<br><span class="grad">своя сцена.</span></h2>
     </div>
+    <div class="stage rv" style="margin-top:54px">
+      <div class="aura"></div>
+      <div class="screen">
+        <video class="on" data-src="media/v-clip.mp4" poster="media/v-clip.jpg" muted playsinline preload="none"></video>
+        <video data-src="media/v-cover.mp4" poster="media/v-cover.jpg" muted playsinline preload="none"></video>
+        <video data-src="media/v-colors.mp4" poster="media/v-colors.jpg" muted playsinline preload="none"></video>
+        <video data-src="media/v-wallpaper.mp4" poster="media/v-wallpaper.jpg" muted playsinline preload="none"></video>
+      </div>
+    </div>
+    <div class="tabs rv">
+      <button class="tab on"><span>Клипы</span><i><b></b></i></button>
+      <button class="tab"><span>Цвет обложки</span><i><b></b></i></button>
+      <button class="tab"><span>Любой цвет</span><i><b></b></i></button>
+      <button class="tab"><span>Живые обои</span><i><b></b></i></button>
+    </div>
+    <p class="cap"></p>
+  </div>
+</section>
+
+<section id="light">
+  <div class="wrap center">
+    <p class="eyebrow rv">Попробуйте сами</p>
+    <h2 class="rv">Свет, который<br><span class="grad">играет вместе с песней.</span></h2>
+    <p class="rv">По краям горит живая кромка в цветах обложки. На ударных вспыхивает и сыплет искрами, на тихих местах успокаивается, на паузе гаснет. Нажмите на цвет — так это выглядит в Avenor.</p>
+    <div class="demo rv">
+      <div class="art" style="background-image:url(media/demo-cover.jpg)"></div>
+      <canvas></canvas>
+      <div class="card"><img src="media/demo-cover.jpg" alt=""><div><b>Better Now</b><span>Post Malone</span></div></div>
+    </div>
+    <div class="swatches rv">
+      <button class="sw auto on" data-c="auto" title="Из обложки"></button>
+      <button class="sw" data-c="255,79,154" style="background:#ff4f9a" title="Розовый"></button>
+      <button class="sw" data-c="255,122,26" style="background:#ff7a1a" title="Огонь"></button>
+      <button class="sw" data-c="58,107,255" style="background:#3a6bff" title="Синий"></button>
+      <button class="sw" data-c="155,92,255" style="background:#9b5cff" title="Фиолетовый"></button>
+      <button class="sw" data-c="24,194,156" style="background:#18c29c" title="Мята"></button>
+      <button class="sw" data-c="255,255,255" style="background:#fff" title="Белый"></button>
+    </div>
+    <div class="demo-row rv"><button class="btn btn-ghost" id="demoPlay">⏸ Пауза</button></div>
   </div>
 </section>
 
@@ -236,11 +303,11 @@
     <h2 class="rv">Слушайте там,<br><span class="grad">где уже ваша музыка.</span></h2>
     <p class="rv">Без новых подписок: Avenor играет ваши лайки и плейлисты из сервисов, которыми вы уже пользуетесь.</p>
     <div class="svc">
-      <div class="c rv"><div class="ic" style="background:#ff1f3d22">▶️</div><h3>YouTube Music</h3><span class="tag">Прямо в Avenor</span><p>Играет внутри Avenor, без браузера. Поиск за секунду, песня — ещё за одну.</p></div>
-      <div class="c rv"><div class="ic" style="background:#1ed76022">🟢</div><h3>Spotify</h3><span class="tag">Ваше приложение</span><p>Выбрали песню — она заиграла в вашем Spotify. Без настройки и ключей.</p></div>
-      <div class="c rv"><div class="ic" style="background:#ffcc0022">🟡</div><h3>Яндекс Музыка</h3><span class="tag">Ваш аккаунт</span><p>«Мне нравится», плейлисты и «Моя волна». То, чего нет в Яндексе, Avenor сыграет через YouTube.</p></div>
-      <div class="c rv"><div class="ic" style="background:#ff550022">🟠</div><h3>SoundCloud</h3><span class="tag">Ваш аккаунт</span><p>Лайки и плейлисты SoundCloud с клипами, светом и текстом.</p></div>
-      <div class="c rv"><div class="ic" style="background:#7b6cff22">🎵</div><h3>Ваши файлы</h3><span class="tag">Папка с музыкой</span><p>Добавьте папку с MP3, FLAC или M4A — и они в той же красоте.</p></div>
+      <div class="c rv spot"><div class="ic" style="background:#ff1f3d22">▶️</div><h3>YouTube Music</h3><span class="tag">Прямо в Avenor</span><p>Играет внутри Avenor, без браузера. Поиск за секунду, песня — ещё за одну.</p></div>
+      <div class="c rv spot"><div class="ic" style="background:#1ed76022">🟢</div><h3>Spotify</h3><span class="tag">Ваше приложение</span><p>Выбрали песню — она заиграла в вашем Spotify. Без настройки и ключей.</p></div>
+      <div class="c rv spot"><div class="ic" style="background:#ffcc0022">🟡</div><h3>Яндекс Музыка</h3><span class="tag">Ваш аккаунт</span><p>«Мне нравится», плейлисты и «Моя волна». То, чего нет в Яндексе, Avenor сыграет через YouTube.</p></div>
+      <div class="c rv spot"><div class="ic" style="background:#ff550022">🟠</div><h3>SoundCloud</h3><span class="tag">Ваш аккаунт</span><p>Лайки и плейлисты SoundCloud с клипами, светом и текстом.</p></div>
+      <div class="c rv spot"><div class="ic" style="background:#7b6cff22">🎵</div><h3>Ваши файлы</h3><span class="tag">Папка с музыкой</span><p>Добавьте папку с MP3, FLAC или M4A — и они в той же красоте.</p></div>
     </div>
   </div>
 </section>
@@ -250,12 +317,12 @@
     <p class="eyebrow rv">Больше, чем свет</p>
     <h2 class="rv">Всё, что нужно,<br><span class="grad">на одном экране.</span></h2>
     <div class="feats">
-      <div class="feat rv"><img src="media/clip.jpg" alt="" loading="lazy"><div class="b"><h3>Текст песни по словам</h3><p>Строки загораются в такт и плавно гаснут. Не тот текст — один клик, и другой вариант.</p></div></div>
-      <div class="feat rv"><img src="media/search.jpg" alt="" loading="lazy"><div class="b"><h3>Поиск за секунду</h3><p>Просто начните печатать. Avenor помнит, что вы искали, и сначала показывает песни нужного исполнителя.</p></div></div>
-      <div class="feat rv"><img src="media/cover.jpg" alt="" loading="lazy"><div class="b"><h3>Только оригинальные клипы</h3><p>Никаких нарезок из TikTok. Если у песни нет клипа — на фоне её обложка.</p></div></div>
-      <div class="feat rv"><img src="media/settings.jpg" alt="" loading="lazy"><div class="b"><h3>Настройте под себя</h3><p>Свет, часы, панели — всё двигается и меняет цвет. Зажмите любую панель и перетащите.</p></div></div>
-      <div class="feat rv"><img src="media/menu.jpg" alt="" loading="lazy"><div class="b"><h3>Видно, где вы вошли</h3><p>Один выбор — где играет музыка. Avenor запоминает его и сразу видит ваши аккаунты.</p></div></div>
-      <div class="feat rv"><img src="media/english.jpg" alt="" loading="lazy"><div class="b"><h3>6 языков</h3><p>Русский, English, Español, Português, Deutsch, Türkçe — выбирается сам по языку Windows.</p></div></div>
+      <div class="feat rv spot"><img src="media/v-hero.jpg" alt="" loading="lazy"><div class="b"><h3>Текст песни по словам</h3><p>Строки загораются в такт и плавно гаснут. Не тот текст — один клик, и другой вариант.</p></div></div>
+      <div class="feat rv spot"><img src="media/search.jpg" alt="" loading="lazy"><div class="b"><h3>Поиск за секунду</h3><p>Просто начните печатать. Avenor помнит, что вы искали, и сначала показывает песни нужного исполнителя.</p></div></div>
+      <div class="feat rv spot"><img src="media/v-cover.jpg" alt="" loading="lazy"><div class="b"><h3>Только оригинальные клипы</h3><p>Никаких нарезок из TikTok. Если у песни нет клипа — на фоне её обложка.</p></div></div>
+      <div class="feat rv spot"><img src="media/settings.jpg" alt="" loading="lazy"><div class="b"><h3>Настройте под себя</h3><p>Свет, часы, панели — всё двигается и меняет цвет. Зажмите любую панель и перетащите.</p></div></div>
+      <div class="feat rv spot"><img src="media/menu.jpg" alt="" loading="lazy"><div class="b"><h3>Видно, где вы вошли</h3><p>Один выбор — где играет музыка. Avenor запоминает его и сразу видит ваши аккаунты.</p></div></div>
+      <div class="feat rv spot"><img src="media/english.jpg" alt="" loading="lazy"><div class="b"><h3>6 языков</h3><p>Русский, English, Español, Português, Deutsch, Türkçe — выбирается сам по языку Windows.</p></div></div>
     </div>
   </div>
 </section>
@@ -264,12 +331,12 @@
   <div class="wrap center">
     <p class="eyebrow rv">Лёгкий для компьютера</p>
     <h2 class="rv">Быстро. Тихо.<br><span class="grad">Ничего лишнего.</span></h2>
-    <p class="rv">Avenor запоминает найденное для каждой песни — клип, текст, обложку — и заранее готовит следующую. От батареи и на паузе он почти не работает.</p>
+    <p class="rv">Avenor запоминает найденное для каждой песни — клип, текст, обложку — и заранее загружает следующую, вместе с рекламой, которая проходит без звука. От батареи и на паузе он почти не работает.</p>
     <div class="stats">
-      <div class="stat rv"><b>0,8&nbsp;с</b><span>поиск в YouTube Music</span></div>
-      <div class="stat rv"><b>1,3&nbsp;с</b><span>от нажатия до звука</span></div>
-      <div class="stat rv"><b>×2</b><span>быстрее клип у песни, которую вы уже слушали</span></div>
-      <div class="stat rv"><b>0</b><span>ресурсов на свет, пока песня на паузе</span></div>
+      <div class="stat rv spot"><b>0,8&nbsp;с</b><span>поиск в YouTube Music</span></div>
+      <div class="stat rv spot"><b>0,2&nbsp;с</b><span>до следующей песни — она готова заранее</span></div>
+      <div class="stat rv spot"><b>×2</b><span>быстрее клип и текст у песен, которые вы лайкнули</span></div>
+      <div class="stat rv spot"><b>0</b><span>ресурсов на свет, пока песня на паузе</span></div>
     </div>
   </div>
 </section>
@@ -279,9 +346,9 @@
     <p class="eyebrow rv">Начать</p>
     <h2 class="rv">Играет через<br><span class="grad">минуту.</span></h2>
     <div class="steps">
-      <div class="step rv"><h3>Скачайте</h3><p>Установщик для Windows или приложение для Android. Без аккаунта и регистрации.</p></div>
-      <div class="step rv"><h3>Выберите сервис</h3><p>Кнопка слева на плеере: YouTube Music, Spotify, Яндекс или SoundCloud. Войдите, если хотите свои лайки.</p></div>
-      <div class="step rv"><h3>Нажмите «Моя волна»</h3><p>Или просто начните печатать название песни. Свет загорится на первой же ноте.</p></div>
+      <div class="step rv spot"><h3>Скачайте</h3><p>Установщик для Windows или приложение для Android. Без аккаунта и регистрации.</p></div>
+      <div class="step rv spot"><h3>Выберите сервис</h3><p>Кнопка слева на плеере: YouTube Music, Spotify, Яндекс или SoundCloud. Войдите, если хотите свои лайки.</p></div>
+      <div class="step rv spot"><h3>Нажмите «Моя волна»</h3><p>Или просто начните печатать название песни. Свет загорится на первой же ноте.</p></div>
     </div>
   </div>
 </section>
@@ -290,7 +357,7 @@
   <div class="wrap center">
     <p class="eyebrow rv">Цена</p>
     <h2 class="rv">Одна цена.<br><span class="grad">Навсегда ваш.</span></h2>
-    <div class="price rv">
+    <div class="price rv spot">
       <div class="amt">$6.99<small>один раз · без подписки</small></div>
       <ul>
         <li>Клип на весь экран, огненный свет, текст песни по словам</li>
@@ -330,12 +397,12 @@
     <p class="eyebrow rv">Скачать</p>
     <h2 class="rv">Попробуйте<br><span class="grad">бесплатно.</span></h2>
     <div class="dl">
-      <div class="c rv" style="text-align:left">
+      <div class="c rv spot" style="text-align:left">
         <h3>Windows</h3>
         <p>Windows 10 и 11. Сам обновляется. Есть и <a href="https://github.com/damireng/avenor/releases/latest/download/Avenor.exe">версия без установки</a>.</p>
         <a class="btn btn-white" href="https://github.com/damireng/avenor/releases/latest/download/Avenor-Setup.exe">Скачать установщик <small>7 дней бесплатно</small></a>
       </div>
-      <div class="c rv" style="text-align:left">
+      <div class="c rv spot" style="text-align:left">
         <h3>Android</h3>
         <p>Android 6 и новее. Яндекс Музыка, Spotify и SoundCloud с вашими аккаунтами. Телефон один раз спросит разрешение на установку.</p>
         <a class="btn btn-ghost" href="https://github.com/damireng/avenor/releases/download/android-1.2.4/Avenor-Android.apk">Скачать APK <small style="color:var(--dim)">1.2.4</small></a>
@@ -368,9 +435,114 @@
   // fade sections in as they scroll into view
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
   document.querySelectorAll('.rv').forEach(el => io.observe(el));
-  // videos play only while on screen (saves battery and data)
-  const vo = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (e.isIntersecting) { v.play().catch(() => {}); } else v.pause(); }), { threshold: .2 });
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // headline: words rise one after another
+  document.querySelectorAll('.hero h1').forEach(h => {
+    let d = 0;
+    const walk = n => { for (const c of [...n.childNodes]) {
+      if (c.nodeType === 3) { const f = document.createDocumentFragment(); c.textContent.split(/(\s+)/).forEach(w => { if (!w) return; if (/^\s+$/.test(w)) f.append(w); else { const s = document.createElement('span'); s.className = 'w'; s.style.setProperty('--d', d++); s.textContent = w; f.append(s); } }); c.replaceWith(f); }
+      else if (c.nodeType === 1 && c.tagName !== 'BR') walk(c); } };
+    h.classList.remove('rv'); h.classList.add('in'); walk(h);
+  });
+
+  // scroll: progress bar on top; the screens lie back in 3D and straighten up as they come into view
+  const bar = document.querySelector('.progress'), stages = [...document.querySelectorAll('.stage')];
+  let ticking = false;
+  const onScroll = () => {
+    ticking = false;
+    const h = document.documentElement; bar.style.setProperty('--p', (h.scrollTop / Math.max(1, h.scrollHeight - innerHeight)).toFixed(4));
+    if (still) return;
+    for (const s of stages) {
+      const r = s.getBoundingClientRect(), p = Math.min(1, Math.max(0, (innerHeight - r.top) / (innerHeight * .75)));
+      s.style.setProperty('--tilt', (24 * (1 - p)).toFixed(2) + 'deg'); s.style.setProperty('--sc', (.9 + .1 * p).toFixed(4));
+    }
+  };
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  addEventListener('resize', onScroll); onScroll();
+
+  // the light around a screen takes the two strongest colors of the video playing in it
+  const cv = document.createElement('canvas'); cv.width = 16; cv.height = 9; const cx = cv.getContext('2d', { willReadFrequently: true });
+  const tint = (stage, v) => {
+    if (!v || v.readyState < 2 || v.paused) return;
+    try { cx.drawImage(v, 0, 0, 16, 9); } catch { return; }
+    const d = cx.getImageData(0, 0, 16, 9).data, side = (x0, x1) => { let r = 0, g = 0, b = 0, n = 0;
+      for (let y = 0; y < 9; y++) for (let x = x0; x < x1; x++) { const i = (y * 16 + x) * 4, m = Math.max(d[i], d[i + 1], d[i + 2]); const w = 1 + m / 40; r += d[i] * w; g += d[i + 1] * w; b += d[i + 2] * w; n += w; }
+      // brighter and more colorful than the plain average, so the light reads as light
+      let c = [r / n, g / n, b / n]; const mx = Math.max(...c, 1), mn = Math.min(...c); c = c.map(v => (v - mn * .55) / Math.max(1, mx - mn * .55) * 255);
+      return c.map(Math.round).join(' '); };
+    stage.style.setProperty('--a1', side(0, 8)); stage.style.setProperty('--a2', side(8, 16));
+  };
+  setInterval(() => { for (const s of stages) tint(s, s.querySelector('.screen video.on') || s.querySelector('.screen video')); }, 400);
+
+  // videos play only while on screen (saves battery and data); the reel's videos are driven by the reel
+  const vo = new IntersectionObserver(es => es.forEach(e => { const v = e.target; if (v.closest('.reel')) return; if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }), { threshold: .2 });
   document.querySelectorAll('video').forEach(v => vo.observe(v));
+
+  // the reel: four scenes, each tab fills up while its video plays, then the next one comes
+  (() => {
+    const reel = document.querySelector('.reel'); if (!reel) return;
+    const vids = [...reel.querySelectorAll('.screen video')], tabs = [...reel.querySelectorAll('.tab')], cap = reel.querySelector('.cap');
+    const CAPS = ['<b>Оригинальный клип на весь экран</b> — без нарезок из TikTok. Свет по краям берёт цвета из кадра.',
+      '<b>Нет клипа — играет обложка.</b> Свет, часы и текст песни окрашиваются в её цвета.',
+      '<b>24 цвета света и свой.</b> Толщина, яркость и скорость огня — как вам нравится.',
+      '<b>Клип и часы — прямо на рабочем столе</b>, под всеми окнами. Одно нажатие.'];
+    let cur = 0, visible = false;
+    const load = v => { if (!v.src) { v.src = v.dataset.src; v.load(); } };
+    const show = i => {
+      cur = i;
+      vids.forEach((v, k) => { v.classList.toggle('on', k === i); if (k !== i) v.pause(); });
+      tabs.forEach((t, k) => { t.classList.toggle('on', k === i); t.style.setProperty('--t', 0); });
+      cap.style.opacity = 0; setTimeout(() => { cap.innerHTML = CAPS[i]; cap.style.opacity = 1; }, 200);
+      const v = vids[i]; load(v); load(vids[(i + 1) % vids.length]);       // the next one loads in the background
+      v.currentTime = 0; if (visible) v.play().catch(() => {});
+    };
+    vids.forEach((v, k) => {
+      v.addEventListener('timeupdate', () => { if (k === cur && v.duration) tabs[k].style.setProperty('--t', (v.currentTime / v.duration).toFixed(3)); });
+      v.addEventListener('ended', () => { if (k === cur) show((cur + 1) % vids.length); });
+    });
+    tabs.forEach((t, k) => t.addEventListener('click', () => show(k)));
+    new IntersectionObserver(es => es.forEach(e => { visible = e.isIntersecting; const v = vids[cur]; if (visible) { load(v); v.play().catch(() => {}); } else v.pause(); }), { threshold: .25 }).observe(reel.querySelector('.screen'));
+    show(0);
+  })();
+
+  // live light demo: the fire edge of Avenor, on a beat (about 100 bpm), in the color you pick
+  (() => {
+    const box = document.querySelector('.demo'); if (!box) return;
+    const c = box.querySelector('canvas'), x = c.getContext('2d');
+    let W = 0, H = 0, dpr = 1, color = 'auto', on = true, vis = false, last = 0, t0 = performance.now(), sparks = [], lvl = 0;
+    const AUTO = [[255, 214, 61], [255, 170, 40], [255, 236, 120]];       // the yellow of the cover in the demo
+    const size = () => { dpr = Math.min(2, devicePixelRatio || 1); const r = box.getBoundingClientRect(); W = r.width; H = r.height; c.width = W * dpr; c.height = H * dpr; };
+    size(); addEventListener('resize', size);
+    const rgb = t => color === 'auto' ? AUTO[Math.floor(t / 1600) % AUTO.length] : color.split(',').map(Number);
+    const frame = now => {
+      requestAnimationFrame(frame);
+      if (!vis || now - last < 30) return; last = now;
+      const t = now - t0, beatT = (t % 600) / 600, kick = on ? Math.pow(1 - beatT, 3) : 0;
+      lvl += ((on ? .55 + .45 * kick : 0) - lvl) * (on ? .35 : .06);
+      x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      if (lvl < .01 && !sparks.length) return;
+      const [r, g, b] = rgb(t), R = 18, th = 8 + 20 * lvl;
+      // the glowing rim: a few soft passes from wide and faint to thin and bright
+      for (const [w, a] of [[th * 5, .10], [th * 2.6, .22], [th * 1.3, .55], [th * .45, .95]]) {
+        x.strokeStyle = `rgba(${r},${g},${b},${a * lvl})`; x.lineWidth = w; x.shadowColor = `rgb(${r},${g},${b})`; x.shadowBlur = w;
+        x.beginPath(); x.roundRect(0, 0, W, H, R); x.stroke();
+      }
+      x.shadowBlur = 0;
+      // sparks fly in from the edges on the beat
+      if (on && kick > .9 && Math.random() < .9) for (let i = 0; i < 10; i++) { const s = Math.floor(Math.random() * 4), p = Math.random();
+        sparks.push({ x: s === 0 ? p * W : s === 1 ? W : s === 2 ? p * W : 0, y: s === 0 ? 0 : s === 1 ? p * H : s === 2 ? H : p * H, vx: s === 1 ? -1.6 : s === 3 ? 1.6 : (Math.random() - .5), vy: s === 0 ? 1.6 : s === 2 ? -1.6 : (Math.random() - .5), life: 1 }); }
+      sparks = sparks.filter(s => (s.life -= .025) > 0);
+      for (const s of sparks) { s.x += s.vx * 1.5; s.y += s.vy * 1.5; x.fillStyle = `rgba(${Math.min(255, r + 60)},${Math.min(255, g + 60)},${Math.min(255, b + 60)},${s.life})`; x.beginPath(); x.arc(s.x, s.y, 1.6 + s.life * 1.4, 0, 7); x.fill(); }
+    };
+    requestAnimationFrame(frame);
+    new IntersectionObserver(es => es.forEach(e => vis = e.isIntersecting), { threshold: .1 }).observe(box);
+    document.querySelectorAll('.sw').forEach(b => b.addEventListener('click', () => { color = b.dataset.c; document.querySelectorAll('.sw').forEach(o => o.classList.toggle('on', o === b)); if (!on) document.getElementById('demoPlay').click(); }));
+    document.getElementById('demoPlay').addEventListener('click', e => { on = !on; e.currentTarget.textContent = on ? '⏸ Пауза' : '▶ Играть'; });
+  })();
+
+  // cards: a soft light follows the cursor
+  document.querySelectorAll('.spot').forEach(el => el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); el.style.setProperty('--mx', (e.clientX - r.left) + 'px'); el.style.setProperty('--my', (e.clientY - r.top) + 'px'); }));
 </script>
 </body>
 </html>
