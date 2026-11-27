@@ -84,14 +84,24 @@
   .band .over h2 { font-size: clamp(28px, 4.2vw, 54px); line-height: 1.04; font-weight: 800; }
   .band .over p { color: rgba(255,255,255,.8); margin: 12px 0 0; max-width: 560px; }
 
-  /* services */
-  .svc { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: 54px; }
-  .svc .c { padding: 24px 22px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); transition: transform .25s, border-color .25s; }
-  .svc .c:hover { transform: translateY(-3px); border-color: rgba(255,255,255,.18); }
-  .svc .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; margin-bottom: 18px; font-size: 22px; }
-  .svc h3 { font: 800 18px/1.2 Manrope, sans-serif; letter-spacing: 0; }
-  .svc .tag { display: inline-block; margin-top: 8px; font: 800 10.5px/1 Manrope, sans-serif; letter-spacing: .14em; text-transform: uppercase; color: var(--orange); }
-  .svc p { color: var(--dim); font-size: 15px; margin: 10px 0 0; }
+  /* services: dark cards, the service's own color glowing from the corner, its logo on a tile */
+  .svc { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; margin-top: 54px; text-align: left; }
+  .svc .c { grid-column: span 2; position: relative; overflow: hidden; padding: 34px 32px 36px; border-radius: 28px;
+    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015)); border: 1px solid rgba(255,255,255,.08);
+    transition: transform .35s cubic-bezier(.2,.7,.2,1), border-color .35s; }
+  .svc .c:nth-child(n+4) { grid-column: span 3; }
+  .svc .c::after { content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; transition: opacity .4s;
+    background: radial-gradient(70% 60% at 14% 8%, rgb(var(--b) / .26), transparent 62%); }
+  .svc .c:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.16); }
+  .svc .c:hover::after { opacity: 1.4; filter: brightness(1.25); }
+  .svc .ic { position: relative; z-index: 1; width: 68px; height: 68px; border-radius: 18px; display: grid; place-items: center; margin-bottom: 34px;
+    background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.09); box-shadow: 0 10px 30px rgb(var(--b) / .18); }
+  .svc .ic svg { width: 36px; height: 36px; }
+  .svc h3 { position: relative; z-index: 1; font: 800 26px/1.15 Manrope, sans-serif; letter-spacing: -.01em; }
+  .svc .tag { position: relative; z-index: 1; display: block; margin-top: 12px; font: 700 13px/1 Manrope, sans-serif; letter-spacing: .2em; text-transform: uppercase; color: rgba(244,241,247,.42); }
+  .svc p { position: relative; z-index: 1; color: rgba(244,241,247,.66); font-size: 17px; line-height: 1.6; margin: 22px 0 0; }
+  @media (max-width: 960px) { .svc { grid-template-columns: 1fr 1fr; } .svc .c, .svc .c:nth-child(n+4) { grid-column: span 1; } .svc .c:last-child { grid-column: 1 / -1; } }
+  @media (max-width: 600px) { .svc { grid-template-columns: 1fr; } .svc .c:last-child { grid-column: auto; } .svc .c { padding: 28px 24px 30px; } .svc .ic { margin-bottom: 26px; } }
 
   /* features grid */
   .feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 54px; }
@@ -303,11 +313,31 @@
     <h2 class="rv">Слушайте там,<br><span class="grad">где уже ваша музыка.</span></h2>
     <p class="rv">Без новых подписок: Avenor играет ваши лайки и плейлисты из сервисов, которыми вы уже пользуетесь.</p>
     <div class="svc">
-      <div class="c rv spot"><div class="ic" style="background:#ff1f3d22">▶️</div><h3>YouTube Music</h3><span class="tag">Прямо в Avenor</span><p>Играет внутри Avenor, без браузера. Поиск за секунду, песня — ещё за одну.</p></div>
-      <div class="c rv spot"><div class="ic" style="background:#1ed76022">🟢</div><h3>Spotify</h3><span class="tag">Ваше приложение</span><p>Выбрали песню — она заиграла в вашем Spotify. Без настройки и ключей.</p></div>
-      <div class="c rv spot"><div class="ic" style="background:#ffcc0022">🟡</div><h3>Яндекс Музыка</h3><span class="tag">Ваш аккаунт</span><p>«Мне нравится», плейлисты и «Моя волна». То, чего нет в Яндексе, Avenor сыграет через YouTube.</p></div>
-      <div class="c rv spot"><div class="ic" style="background:#ff550022">🟠</div><h3>SoundCloud</h3><span class="tag">Ваш аккаунт</span><p>Лайки и плейлисты SoundCloud с клипами, светом и текстом.</p></div>
-      <div class="c rv spot"><div class="ic" style="background:#7b6cff22">🎵</div><h3>Ваши файлы</h3><span class="tag">Папка с музыкой</span><p>Добавьте папку с MP3, FLAC или M4A — и они в той же красоте.</p></div>
+      <div class="c rv spot" style="--b: 255 0 51">
+        <div class="ic"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="#ff0033"/><circle cx="18" cy="18" r="9.2" fill="none" stroke="#fff" stroke-width="2"/><path d="M15.4 13.6v8.8l7.2-4.4z" fill="#fff"/></svg></div>
+        <h3>YouTube Music</h3><span class="tag">Прямо в Avenor</span>
+        <p>Играет внутри Avenor, без браузера. Поиск за секунду, следующая песня готова заранее — включается мгновенно.</p>
+      </div>
+      <div class="c rv spot" style="--b: 30 215 96">
+        <div class="ic"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="#1ed760"/><g fill="none" stroke="#0b0b0b" stroke-linecap="round"><path d="M9.6 13.6c5.6-1.7 12-1.2 16.8 1.5" stroke-width="2.6"/><path d="M10.6 18.2c4.6-1.3 9.8-.9 13.8 1.3" stroke-width="2.2"/><path d="M11.4 22.4c3.8-1 7.6-.7 10.8 1" stroke-width="1.8"/></g></svg></div>
+        <h3>Spotify</h3><span class="tag">Ваше приложение</span>
+        <p>Выбрали песню в Avenor — она заиграла в вашем Spotify. Без настройки и ключей, свет и текст следуют за каждой песней.</p>
+      </div>
+      <div class="c rv spot" style="--b: 255 204 0">
+        <div class="ic"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="#ffcc00"/><path d="M21.5 10.5v10.2a3.3 3.3 0 1 1-2-3V12.8l-5 1.3v8.6a3.3 3.3 0 1 1-2-3v-7.2z" fill="#121212"/></svg></div>
+        <h3>Яндекс Музыка</h3><span class="tag">Ваш аккаунт</span>
+        <p>«Мне нравится», плейлисты и «Моя волна». Чего нет в Яндексе, Avenor сыграет через YouTube Music.</p>
+      </div>
+      <div class="c rv spot" style="--b: 255 85 0">
+        <div class="ic"><svg viewBox="0 0 36 36"><g fill="#ff5500"><rect x="4" y="18" width="1.6" height="6" rx=".8"/><rect x="7" y="16" width="1.6" height="8" rx=".8"/><rect x="10" y="14.5" width="1.6" height="9.5" rx=".8"/><rect x="13" y="13" width="1.6" height="11" rx=".8"/><path d="M16 12.4a7.2 7.2 0 0 1 9.9 3.8 4 4 0 1 1 1.4 7.8H16z"/></g></svg></div>
+        <h3>SoundCloud</h3><span class="tag">Ваш аккаунт</span>
+        <p>Лайки и плейлисты SoundCloud, а «Моя волна» собирается из его собственных станций — под ваш вкус, со светом на каждом ударе.</p>
+      </div>
+      <div class="c rv spot" style="--b: 155 92 255">
+        <div class="ic"><svg viewBox="0 0 36 36"><path d="M5 10.5A2.5 2.5 0 0 1 7.5 8h6.2l2.6 3h12.2A2.5 2.5 0 0 1 31 13.5v12A2.5 2.5 0 0 1 28.5 28h-21A2.5 2.5 0 0 1 5 25.5z" fill="#9b5cff"/><path d="M20.5 14.5v6.6a2.3 2.3 0 1 1-1.5-2.1v-3.7l-3.5.9v5.6a2.3 2.3 0 1 1-1.5-2.1v-4.6z" fill="#fff"/></svg></div>
+        <h3>Ваши файлы</h3><span class="tag">Папка с музыкой</span>
+        <p>Добавьте папку с MP3, FLAC или M4A — и они в той же красоте: свет, обложка и текст песни.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -522,7 +552,7 @@
       lvl += ((on ? .55 + .45 * kick : 0) - lvl) * (on ? .35 : .06);
       x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
       if (lvl < .01 && !sparks.length) return;
-      const [r, g, b] = rgb(t), R = 18, th = 8 + 20 * lvl;
+      const [r, g, b] = rgb(t), R = 18, k = Math.min(1, W / 900), th = (8 + 20 * lvl) * (.45 + .55 * k);   // (thinner on a small screen)
       // the glowing rim: a few soft passes from wide and faint to thin and bright
       for (const [w, a] of [[th * 5, .10], [th * 2.6, .22], [th * 1.3, .55], [th * .45, .95]]) {
         x.strokeStyle = `rgba(${r},${g},${b},${a * lvl})`; x.lineWidth = w; x.shadowColor = `rgb(${r},${g},${b})`; x.shadowBlur = w;
